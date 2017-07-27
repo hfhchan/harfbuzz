@@ -365,6 +365,26 @@ struct VariationSelectorRecord
     }
     return GLYPH_VARIANT_NOT_FOUND;
   }
+  
+  inline glyph_variant_t get_glyph_or_nodef (hb_codepoint_t codepoint,
+				             hb_codepoint_t *glyph,
+				             const void *base) const
+  {
+    int i;
+    const DefaultUVS &defaults = base+defaultUVS;
+    i = defaults.bsearch (codepoint);
+    if (i != -1)
+      return GLYPH_VARIANT_USE_DEFAULT;
+    const NonDefaultUVS &nonDefaults = base+nonDefaultUVS;
+    i = nonDefaults.bsearch (codepoint);
+    if (i != -1)
+    {
+      *glyph = nonDefaults[i].glyphID;
+       return GLYPH_VARIANT_FOUND;
+    }
+    *glyph = 0;
+    return GLYPH_VARIANT_NOT_FOUND;
+  }
 
   inline int cmp (const hb_codepoint_t &variation_selector) const
   {
